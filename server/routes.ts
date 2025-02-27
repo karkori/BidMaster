@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { WebSocketServer } from "ws";
+import { WebSocketServer, WebSocket } from "ws";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertAuctionSchema, insertBidSchema } from "@shared/schema";
@@ -63,7 +63,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const bid = JSON.parse(data.toString());
         const result = insertBidSchema.safeParse(bid);
-        
+
         if (!result.success) {
           ws.send(JSON.stringify({ error: "Invalid bid data" }));
           return;
@@ -81,11 +81,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         await storage.updateAuctionPrice(bid.auctionId, bid.amount);
-        await storage.createBid(bid);
+        const newBid = await storage.createBid({
+          ...bid,
+          bidderId: (ws as any).user?.id || 0,
+        });
 
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ type: "bid", data: bid }));
+            client.send(JSON.stringify({ type: "bid", data: newBid }));
           }
         });
       } catch (error) {
