@@ -4,21 +4,47 @@ import type { Auction } from "@shared/schema";
 import { useEffect, useState } from "react";
 
 export function AuctionGrid() {
-  const [socket, setSocket] = useState<WebSocket>();
-  
-  useEffect(() => {
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
-    const ws = new WebSocket(wsUrl);
-    setSocket(ws);
-    return () => ws.close();
-  }, []);
+  const [auctions, setAuctions] = useState<Auction[]>([]);
 
-  const { data: auctions, isLoading } = useQuery<Auction[]>({
+  const { data: initialAuctions, isLoading } = useQuery<Auction[]>({
     queryKey: ["/api/auctions"],
   });
 
-  if (isLoading || !socket) {
+  useEffect(() => {
+    if (initialAuctions) {
+      setAuctions(initialAuctions);
+    }
+  }, [initialAuctions]);
+
+  useEffect(() => {
+    const eventSource = new EventSource("/api/auctions/events");
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      switch (data.type) {
+        case "initial":
+          setAuctions(data.data);
+          break;
+        case "new_auction":
+          setAuctions(prev => [...prev, data.data]);
+          break;
+        case "new_bid":
+          setAuctions(prev => prev.map(auction => 
+            auction.id === data.data.auctionId
+              ? { ...auction, currentPrice: data.data.currentPrice }
+              : auction
+          ));
+          break;
+      }
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
+  if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
         {[...Array(6)].map((_, i) => (
@@ -37,7 +63,6 @@ export function AuctionGrid() {
         <AuctionCard
           key={auction.id}
           auction={auction}
-          socket={socket}
         />
       ))}
     </div>

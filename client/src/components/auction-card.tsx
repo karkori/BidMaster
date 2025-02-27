@@ -2,38 +2,21 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { Auction } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
 
 interface AuctionCardProps {
   auction: Auction;
-  socket: WebSocket;
 }
 
-export function AuctionCard({ auction, socket }: AuctionCardProps) {
-  const [currentPrice, setCurrentPrice] = useState(auction.currentPrice);
+export function AuctionCard({ auction }: AuctionCardProps) {
   const [bidAmount, setBidAmount] = useState("");
   const { toast } = useToast();
 
-  useEffect(() => {
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "bid" && data.data.auctionId === auction.id) {
-        setCurrentPrice(data.data.amount);
-      }
-      if (data.error) {
-        toast({
-          title: "Bid failed",
-          description: data.error,
-          variant: "destructive",
-        });
-      }
-    };
-  }, [socket, auction.id, toast]);
-
-  const handleBid = () => {
+  const handleBid = async () => {
     const amount = parseInt(bidAmount);
-    if (isNaN(amount) || amount <= currentPrice) {
+    if (isNaN(amount) || amount <= auction.currentPrice) {
       toast({
         title: "Invalid bid",
         description: "Bid must be higher than current price",
@@ -42,13 +25,16 @@ export function AuctionCard({ auction, socket }: AuctionCardProps) {
       return;
     }
 
-    socket.send(
-      JSON.stringify({
-        amount,
-        auctionId: auction.id,
-      })
-    );
-    setBidAmount("");
+    try {
+      await apiRequest("POST", `/api/auctions/${auction.id}/bid`, { amount });
+      setBidAmount("");
+    } catch (error: any) {
+      toast({
+        title: "Bid failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -64,7 +50,7 @@ export function AuctionCard({ auction, socket }: AuctionCardProps) {
           {auction.description}
         </p>
         <div className="text-xl font-bold mb-2">
-          Current Price: ${currentPrice}
+          Current Price: ${auction.currentPrice}
         </div>
       </CardContent>
 

@@ -22,7 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function CreateAuction() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  
+
   const form = useForm({
     resolver: zodResolver(insertAuctionSchema),
     defaultValues: {
@@ -48,12 +48,18 @@ export default function CreateAuction() {
       setLocation("/");
     },
     onError: (error: Error) => {
+      console.error("Error creating auction:", error);
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
       });
     },
+  });
+
+  const onSubmit = form.handleSubmit((data) => {
+    console.log("Form data:", data);
+    createMutation.mutate(data);
   });
 
   return (
@@ -63,10 +69,10 @@ export default function CreateAuction() {
         <Card className="max-w-2xl mx-auto">
           <CardContent className="pt-6">
             <h1 className="text-2xl font-bold mb-6">Create New Auction</h1>
-            
+
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit((data) => createMutation.mutate(data))}
+                onSubmit={onSubmit}
                 className="space-y-4"
               >
                 <FormField
@@ -153,13 +159,21 @@ export default function CreateAuction() {
                   )}
                 />
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={createMutation.isPending}
-                >
-                  Create Auction
-                </Button>
+                <div className="flex items-center justify-end gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setLocation("/")}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={createMutation.isPending}
+                  >
+                    Create Auction
+                  </Button>
+                </div>
               </form>
             </Form>
           </CardContent>
