@@ -1,6 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { serveStatic, log } from "./vite";
+import { setupVite, log } from "./vite";
 
 const app = express();
 app.use(express.json());
@@ -46,8 +46,9 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
   });
 
-  // Temporalmente usamos serveStatic directamente para evitar problemas con Vite
-  serveStatic(app);
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  }
 
   const port = 5000;
   server.listen({
