@@ -1,94 +1,95 @@
 import type { InsertUser, User, Auction, Bid } from "@shared/schema";
+import { users, auctions, bids } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, lt, desc } from "drizzle-orm";
 import session from "express-session";
-import createMemoryStore from "memorystore";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
 
-const MemoryStore = createMemoryStore(session);
+const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   createAuction(auction: Omit<Auction, "id">): Promise<Auction>;
   getAuction(id: number): Promise<Auction | undefined>;
   getActiveAuctions(): Promise<Auction[]>;
   updateAuctionPrice(id: number, price: number): Promise<void>;
-  
+
   createBid(bid: Omit<Bid, "id" | "createdAt">): Promise<Bid>;
   getAuctionBids(auctionId: number): Promise<Bid[]>;
-  
+
   sessionStore: session.Store;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private auctions: Map<number, Auction>;
-  private bids: Map<number, Bid>;
-  private currentId: number;
+export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
   constructor() {
-    this.users = new Map();
-    this.auctions = new Map();
-    this.bids = new Map();
-    this.currentId = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
+    this.sessionStore = new PostgresSessionStore({
+      pool,
+      createTableIfMissing: true,
     });
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async createAuction(auction: Omit<Auction, "id">): Promise<Auction> {
-    const id = this.currentId++;
-    const newAuction: Auction = { ...auction, id };
-    this.auctions.set(id, newAuction);
+    const [newAuction] = await db.insert(auctions).values(auction).returning();
     return newAuction;
   }
 
   async getAuction(id: number): Promise<Auction | undefined> {
-    return this.auctions.get(id);
+    const [auction] = await db.select().from(auctions).where(eq(auctions.id, id));
+    return auction;
   }
 
   async getActiveAuctions(): Promise<Auction[]> {
-    return Array.from(this.auctions.values()).filter(
-      (auction) => auction.isActive && auction.endTime > new Date(),
-    );
+    return db
+      .select()
+      .from(auctions)
+      .where(
+        and(
+          eq(auctions.isActive, true),
+          lt(auctions.endTime, new Date())
+        )
+      );
   }
 
   async updateAuctionPrice(id: number, price: number): Promise<void> {
-    const auction = await this.getAuction(id);
-    if (!auction) throw new Error("Auction not found");
-    this.auctions.set(id, { ...auction, currentPrice: price });
+    await db
+      .update(auctions)
+      .set({ currentPrice: price })
+      .where(eq(auctions.id, id));
   }
 
   async createBid(bid: Omit<Bid, "id" | "createdAt">): Promise<Bid> {
-    const id = this.currentId++;
-    const newBid: Bid = { ...bid, id, createdAt: new Date() };
-    this.bids.set(id, newBid);
+    const [newBid] = await db.insert(bids).values(bid).returning();
     return newBid;
   }
 
   async getAuctionBids(auctionId: number): Promise<Bid[]> {
-    return Array.from(this.bids.values())
-      .filter((bid) => bid.auctionId === auctionId)
-      .sort((a, b) => b.amount - a.amount);
+    return db
+      .select()
+      .from(bids)
+      .where(eq(bids.auctionId, auctionId))
+      .orderBy(desc(bids.amount));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
