@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AuctionService } from '../../services/auction.service';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { NgIf } from '@angular/common';
+import { AuctionService } from '../../services/auction.service';
 
 @Component({
   selector: 'app-auction-filter',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './auction-filter.component.html',
   animations: [
     trigger('filterAnimation', [
@@ -24,7 +26,6 @@ import { NgIf } from '@angular/common';
       ]),
     ]),
   ],
-  imports: [NgIf, ReactiveFormsModule],
 })
 export class AuctionFilterComponent implements OnInit {
   filterForm: FormGroup;
