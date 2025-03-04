@@ -34,29 +34,39 @@ export class AuctionService {
 
   getFilteredAuctions(filters: AuctionFilters): Observable<Auction[]> {
     return this.getAuctions().pipe(
-      map(auctions => this.applyFilters(auctions, filters))
+      map((auctions) => this.applyFilters(auctions, filters)),
     );
   }
 
-  private applyFilters(auctions: Auction[], filters: AuctionFilters): Auction[] {
-    return auctions.filter(auction => {
+  private applyFilters(
+    auctions: Auction[],
+    filters: AuctionFilters,
+  ): Auction[] {
+    return auctions.filter((auction) => {
       if (filters.priceRange) {
-        if (auction.currentPrice < filters.priceRange.min || 
-            auction.currentPrice > filters.priceRange.max) {
+        if (
+          auction.currentPrice < filters.priceRange.min ||
+          auction.currentPrice > filters.priceRange.max
+        ) {
           return false;
         }
       }
-      
-      if (filters.isActive !== undefined && auction.isActive !== filters.isActive) {
+
+      if (
+        filters.isActive !== undefined &&
+        auction.isActive !== filters.isActive
+      ) {
         return false;
       }
-      
+
       if (filters.searchTerm) {
         const searchLower = filters.searchTerm.toLowerCase();
-        return auction.title.toLowerCase().includes(searchLower) ||
-               auction.description.toLowerCase().includes(searchLower);
+        return (
+          auction.title.toLowerCase().includes(searchLower) ||
+          auction.description.toLowerCase().includes(searchLower)
+        );
       }
-      
+
       return true;
     });
   }
