@@ -1,10 +1,11 @@
 import {
   ApplicationConfig,
-  importProvidersFrom,
+  importProvidersFrom
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { BrowserModule } from '@angular/platform-browser';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -12,6 +13,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimations(),
     provideHttpClient(),
-    importProvidersFrom([BrowserAnimationsModule]),
+    importProvidersFrom(BrowserModule)
   ],
 };

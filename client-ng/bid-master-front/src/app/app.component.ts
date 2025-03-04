@@ -18,7 +18,7 @@ import { AuctionService } from './services/auction.service';
   ],
   providers: [AuctionService],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']  
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   title = 'bid-master-front';

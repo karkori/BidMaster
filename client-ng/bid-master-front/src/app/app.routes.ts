@@ -1,9 +1,14 @@
 import { Routes } from '@angular/router';
-import { AppComponent } from './app.component';
 
+// Definimos las rutas base de la aplicación
 export const routes: Routes = [
   {
     path: '',
-    component: AppComponent
+    redirectTo: 'auctions',
+    pathMatch: 'full'
+  },
+  {
+    path: 'auctions',
+    loadComponent: () => import('./app.component').then(m => m.AppComponent)
   }
 ];
