@@ -26,6 +26,7 @@ import { AuctionService } from '../../services/auction.service';
       ]),
     ]),
   ],
+  providers: []
 })
 export class AuctionFilterComponent implements OnInit {
   filterForm: FormGroup;
