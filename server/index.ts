@@ -1,11 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
+import path from "path";
 import { registerRoutes } from "./routes";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// CORS configuration for Angular client
+// CORS configuration for Angular client during development
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
@@ -54,6 +55,7 @@ app.use((req, res, next) => {
   console.log("Initializing API server..."); 
   const server = await registerRoutes(app);
 
+  // Error handling middleware
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     console.error("Error:", err);
     const status = err.status || err.statusCode || 500;
@@ -61,9 +63,16 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
   });
 
-  // Root path response
-  app.get('/', (_req, res) => {
-    res.json({ message: 'BidMaster API Server' });
+  // Serve static files from Angular build directory
+  const angularDistPath = path.join(process.cwd(), 'client-ng', 'bid-master-front', 'dist', 'bid-master-front', 'browser');
+  app.use(express.static(angularDistPath));
+
+  // Handle Angular routes - send index.html for any non-API routes
+  app.get('*', (req, res, next) => {
+    if (req.url.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(angularDistPath, 'index.html'));
   });
 
   // ALWAYS serve the app on port 5000
