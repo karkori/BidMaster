@@ -16,7 +16,10 @@ import { AuctionService } from './services/auction.service';
     AuctionFilterComponent, 
     AuctionListComponent
   ],
-  providers: [AuctionService],
+  providers: [
+    AuctionService,
+    { provide: 'API_URL', useValue: 'http://localhost:5000/api' }
+  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })

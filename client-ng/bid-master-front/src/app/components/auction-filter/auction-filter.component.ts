@@ -28,8 +28,7 @@ import { AuctionService } from '../../services/auction.service';
         ),
       ]),
     ]),
-  ],
-  providers: [FormBuilder]
+  ]
 })
 export class AuctionFilterComponent implements OnInit {
   filterForm: FormGroup;
@@ -37,7 +36,7 @@ export class AuctionFilterComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private auctionService: AuctionService,
+    private auctionService: AuctionService
   ) {
     this.filterForm = this.fb.group({
       searchTerm: [''],

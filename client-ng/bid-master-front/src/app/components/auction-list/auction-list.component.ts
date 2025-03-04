@@ -50,15 +50,7 @@ import {
           ]),
         ], { optional: true }),
       ]),
-    ]),
-    // trigger('cardHover', [
-    //   transition(':hover', [
-    //     animate('200ms ease-out', style({ 
-    //       transform: 'translateY(-5px)',
-    //       boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
-    //     }))
-    //   ])
-    // ])
+    ])
   ]
 })
 export class AuctionListComponent implements OnInit {
