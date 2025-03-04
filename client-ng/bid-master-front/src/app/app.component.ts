@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { AuctionFilterComponent } from './components/auction-filter/auction-filter.component';
 import { AuctionListComponent } from './components/auction-list/auction-list.component';
 import { AuctionService } from './services/auction.service';
@@ -9,6 +10,7 @@ import { AuctionService } from './services/auction.service';
   selector: 'app-root',
   standalone: true,
   imports: [
+    CommonModule,
     RouterOutlet, 
     HttpClientModule,
     AuctionFilterComponent, 
@@ -16,7 +18,7 @@ import { AuctionService } from './services/auction.service';
   ],
   providers: [AuctionService],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  styleUrls: ['./app.component.css']  
 })
 export class AppComponent {
   title = 'bid-master-front';
