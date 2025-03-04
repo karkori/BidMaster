@@ -8,8 +8,14 @@ app.use(express.urlencoded({ extended: false }));
 // CORS configuration for Angular client
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
   next();
 });
 
@@ -37,7 +43,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      console.log(logLine); //Using console.log instead of log from vite.
+      console.log(logLine);
     }
   });
 
@@ -45,7 +51,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  console.log("Initializing API server..."); //Using console.log instead of log from vite.
+  console.log("Initializing API server..."); 
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -62,13 +68,13 @@ app.use((req, res, next) => {
 
   // ALWAYS serve the app on port 5000
   const port = process.env.PORT || 5000;
-  console.log(`Configured port: ${port} (from environment: ${!!process.env.PORT})`); //Using console.log instead of log from vite.
+  console.log(`Configured port: ${port} (from environment: ${!!process.env.PORT})`);
 
   server.listen({
     port,
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
-    console.log(`API server running on port ${port}`); //Using console.log instead of log from vite.
+    console.log(`API server running on port ${port}`);
   });
 })();

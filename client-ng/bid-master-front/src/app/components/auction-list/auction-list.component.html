@@ -6,23 +6,41 @@
 
   <!-- Lista de subastas -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" [@listAnimation]="auctions.length">
-    <div *ngFor="let auction of auctions" class="auction-card">
-      <img [src]="auction.imageUrl" [alt]="auction.title" class="w-full h-48 object-cover rounded-t-lg">
-      <div class="p-4">
-        <h3 class="text-lg font-semibold mb-2">{{ auction.title }}</h3>
-        <p class="text-sm text-gray-600 mb-4">{{ auction.description }}</p>
-        <div class="flex justify-between items-center">
-          <span class="text-xl font-bold">${{ auction.currentPrice }}</span>
-          <span [class.text-green-500]="auction.isActive" [class.text-red-500]="!auction.isActive" class="text-sm">
-            {{ auction.isActive ? 'Activa' : 'Finalizada' }}
-          </span>
+    <div *ngFor="let auction of auctions" 
+         class="auction-card transform transition-all duration-300"
+         [@cardHover]>
+      <div class="relative overflow-hidden rounded-t-lg">
+        <img [src]="auction.imageUrl" 
+             [alt]="auction.title" 
+             class="w-full h-48 object-cover transition-transform duration-300 hover:scale-105">
+        <div class="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-semibold"
+             [class.bg-green-500]="auction.isActive"
+             [class.bg-red-500]="!auction.isActive"
+             [class.text-white]="true">
+          {{ auction.isActive ? 'Activa' : 'Finalizada' }}
+        </div>
+      </div>
+
+      <div class="p-4 space-y-4">
+        <h3 class="text-lg font-semibold line-clamp-2">{{ auction.title }}</h3>
+        <p class="text-sm text-gray-600 line-clamp-3">{{ auction.description }}</p>
+
+        <div class="flex justify-between items-center pt-2">
+          <div class="space-y-1">
+            <p class="text-sm text-gray-500">Precio actual</p>
+            <p class="text-xl font-bold text-blue-600">${{ auction.currentPrice }}</p>
+          </div>
+          <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200">
+            Pujar
+          </button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Estado vacío -->
-  <div *ngIf="!loading && auctions.length === 0" class="text-center py-12">
+  <div *ngIf="!loading && auctions.length === 0" 
+       class="text-center py-12 bg-gray-50 rounded-lg">
     <p class="text-gray-500 text-lg">No se encontraron subastas que coincidan con los filtros.</p>
   </div>
 </div>

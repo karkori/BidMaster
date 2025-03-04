@@ -1,8 +1,9 @@
+/*
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { AuctionFilterComponent } from './components/auction-filter/auction-filter.component';
@@ -10,18 +11,16 @@ import { AuctionListComponent } from './components/auction-list/auction-list.com
 import { AuctionService } from './services/auction.service';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    AuctionFilterComponent,
-    AuctionListComponent
-  ],
+  declarations: [AppComponent, AuctionFilterComponent, AuctionListComponent],
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    ReactiveFormsModule
+    //BrowserModule,
+    //BrowserAnimationsModule,
+    //HttpClientModule,
+    //ReactiveFormsModule,
+    //FormsModule,
   ],
   providers: [AuctionService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
+*/

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { AuctionService, AuctionFilters } from '../../services/auction.service';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AuctionService } from '../../services/auction.service';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-auction-filter',
@@ -10,13 +11,20 @@ import { trigger, transition, style, animate } from '@angular/animations';
     trigger('filterAnimation', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(-10px)' }),
-        animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+        animate(
+          '300ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0)' }),
+        ),
       ]),
       transition(':leave', [
-        animate('200ms ease-in', style({ opacity: 0, transform: 'translateY(-10px)' }))
-      ])
-    ])
-  ]
+        animate(
+          '200ms ease-in',
+          style({ opacity: 0, transform: 'translateY(-10px)' }),
+        ),
+      ]),
+    ]),
+  ],
+  imports: [NgIf, ReactiveFormsModule],
 })
 export class AuctionFilterComponent implements OnInit {
   filterForm: FormGroup;
@@ -24,20 +32,20 @@ export class AuctionFilterComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private auctionService: AuctionService
+    private auctionService: AuctionService,
   ) {
     this.filterForm = this.fb.group({
       searchTerm: [''],
       priceRange: this.fb.group({
         min: [0],
-        max: [999999]
+        max: [999999],
       }),
-      isActive: [true]
+      isActive: [true],
     });
   }
 
   ngOnInit() {
-    this.filterForm.valueChanges.subscribe(values => {
+    this.filterForm.valueChanges.subscribe((values) => {
       this.auctionService.updateFilters(values);
     });
   }
@@ -50,7 +58,7 @@ export class AuctionFilterComponent implements OnInit {
     this.filterForm.reset({
       searchTerm: '',
       priceRange: { min: 0, max: 999999 },
-      isActive: true
+      isActive: true,
     });
   }
 }
