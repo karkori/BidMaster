@@ -23,8 +23,8 @@ export interface AuctionFilters {
   providedIn: 'root',
 })
 export class AuctionService {
-  // Updated to use window.location.origin to get the correct base URL
-  private apiUrl = `${window.location.origin}/api`;
+  // Use relative URL to make API requests work in all environments
+  private apiUrl = '/api';
   private filtersSubject = new BehaviorSubject<AuctionFilters>({});
 
   http = inject(HttpClient);
