@@ -20,7 +20,7 @@ export interface AuctionFilters {
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuctionService {
   private apiUrl = 'http://localhost:5000/api';
@@ -34,14 +34,11 @@ export class AuctionService {
 
   getFilteredAuctions(filters: AuctionFilters): Observable<Auction[]> {
     return this.getAuctions().pipe(
-      map((auctions) => this.applyFilters(auctions, filters)),
+      map((auctions) => this.applyFilters(auctions, filters))
     );
   }
 
-  private applyFilters(
-    auctions: Auction[],
-    filters: AuctionFilters,
-  ): Auction[] {
+  private applyFilters(auctions: Auction[], filters: AuctionFilters): Auction[] {
     return auctions.filter((auction) => {
       if (filters.priceRange) {
         if (
@@ -52,10 +49,7 @@ export class AuctionService {
         }
       }
 
-      if (
-        filters.isActive !== undefined &&
-        auction.isActive !== filters.isActive
-      ) {
+      if (filters.isActive !== undefined && auction.isActive !== filters.isActive) {
         return false;
       }
 

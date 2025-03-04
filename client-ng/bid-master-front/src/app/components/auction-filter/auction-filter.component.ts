@@ -7,7 +7,10 @@ import { AuctionService } from '../../services/auction.service';
 @Component({
   selector: 'app-auction-filter',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule
+  ],
   templateUrl: './auction-filter.component.html',
   animations: [
     trigger('filterAnimation', [
@@ -26,7 +29,7 @@ import { AuctionService } from '../../services/auction.service';
       ]),
     ]),
   ],
-  providers: []
+  providers: [FormBuilder]
 })
 export class AuctionFilterComponent implements OnInit {
   filterForm: FormGroup;
