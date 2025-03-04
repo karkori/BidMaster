@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 
@@ -13,8 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideExperimentalZonelessChangeDetection(),
     provideRouter(routes),
     provideAnimations(),
-    provideHttpClient()
+    provideHttpClient(withFetch())
     //importProvidersFrom([BrowserAnimationsModule]),
-
   ],
 };
