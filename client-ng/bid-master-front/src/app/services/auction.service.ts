@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -20,13 +20,13 @@ export interface AuctionFilters {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuctionService {
   private apiUrl = 'http://localhost:5000/api';
   private filtersSubject = new BehaviorSubject<AuctionFilters>({});
-  
-  constructor(private http: HttpClient) {}
+
+  http = inject(HttpClient);
 
   getAuctions(): Observable<Auction[]> {
     return this.http.get<Auction[]>(`${this.apiUrl}/auctions`);
