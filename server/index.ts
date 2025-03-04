@@ -1,11 +1,19 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, log } from "./vite";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// CORS configuration for Angular client
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  next();
+});
+
+// Logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -29,7 +37,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      console.log(logLine); //Using console.log instead of log from vite.
     }
   });
 
@@ -37,6 +45,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  console.log("Initializing API server..."); //Using console.log instead of log from vite.
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -46,16 +55,20 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
   });
 
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  }
+  // Root path response
+  app.get('/', (_req, res) => {
+    res.json({ message: 'BidMaster API Server' });
+  });
 
-  const port = 5000;
+  // ALWAYS serve the app on port 5000
+  const port = process.env.PORT || 5000;
+  console.log(`Configured port: ${port} (from environment: ${!!process.env.PORT})`); //Using console.log instead of log from vite.
+
   server.listen({
     port,
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
-    log(`serving on port ${port}`);
+    console.log(`API server running on port ${port}`); //Using console.log instead of log from vite.
   });
 })();

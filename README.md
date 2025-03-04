@@ -4,7 +4,7 @@ Plataforma de subastas online desarrollada con Angular 19 y NestJS, ofreciendo u
 
 ## Stack Tecnológico
 
-- **Frontend:** Angular 19 con SSR/SSG
+- **Frontend:** Angular 19 con SSR/SSG (en client-ng/bid-master-front)
 - **Backend:** NestJS con PostgreSQL
 - **Autenticación:** Auth0/Firebase
 - **Comunicación en tiempo real:** Server-Sent Events (SSE)
@@ -18,13 +18,31 @@ Plataforma de subastas online desarrollada con Angular 19 y NestJS, ofreciendo u
 - Base de datos PostgreSQL para persistencia de datos
 - Comunicación en tiempo real mediante SSE
 
+## Estructura del Proyecto
+
+```
+.
+├── client-ng/           # Cliente Angular
+│   └── bid-master-front # Aplicación principal
+├── server/             # Backend API
+└── shared/             # Código compartido
+```
+
 ## Scripts Disponibles
 
-- `npm run dev`: Inicia el servidor de desarrollo
+### Backend (Puerto 3000)
+- `npm run dev`: Inicia el servidor de desarrollo API
 - `npm run build`: Construye la aplicación para producción
 - `npm run start`: Inicia la aplicación en modo producción
 - `npm run check`: Ejecuta la verificación de tipos TypeScript
 - `npm run db:push`: Actualiza el esquema de la base de datos
+
+### Frontend (Puerto 4200)
+Para iniciar el frontend, navega a la carpeta del proyecto Angular:
+```bash
+cd client-ng/bid-master-front
+ng serve
+```
 
 ## Estado del Proyecto
 
