@@ -8,7 +8,7 @@ import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 
 declare global {
-  namespace Express {
+  namespace Express { 
     interface User extends SelectUser {}
   }
 }
