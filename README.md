@@ -28,4 +28,4 @@ Plataforma de subastas online desarrollada con Angular 19 y NestJS, ofreciendo u
 
 ## Estado del Proyecto
 
-En desarrollo activo - Marzo 2025
+En desarrollo activo - Marzo 2025.
