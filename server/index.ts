@@ -8,7 +8,16 @@ app.use(express.urlencoded({ extended: false }));
 
 // CORS configuration for Angular client during development
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
+  const allowedOrigins = ['http://localhost:4200', 'https://' + process.env.REPL_SLUG + '.' + process.env.REPL_OWNER + '.repl.co'];
+  const origin = req.headers.origin;
+
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else {
+    // En desarrollo, permitimos cualquier origen
+    res.header('Access-Control-Allow-Origin', '*');
+  }
+
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');

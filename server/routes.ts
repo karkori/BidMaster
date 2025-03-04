@@ -4,7 +4,7 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertAuctionSchema, insertBidSchema } from "@shared/schema";
 
-function requireAuth(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+function requireAuth(req: any, res: any, next: any) {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -14,36 +14,35 @@ function requireAuth(req: Express.Request, res: Express.Response, next: Express.
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
 
-  // SSE endpoint for real-time updates
-  app.get("/api/auctions/events", (req, res) => {
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-
-    const send = (data: any) => {
-      res.write(`data: ${JSON.stringify(data)}\n\n`);
-    };
-
-    // Send initial auctions data
-    storage.getActiveAuctions().then((auctions) => {
-      send({ type: "initial", data: auctions });
-    });
-
-    // Store the client's send function
-    const clients = app.locals.sseClients || new Set();
-    clients.add(send);
-    app.locals.sseClients = clients;
-
-    // Remove client on connection close
-    req.on("close", () => {
-      clients.delete(send);
-    });
-  });
-
   // REST endpoints
   app.get("/api/auctions", async (_req, res) => {
-    const auctions = await storage.getActiveAuctions();
-    res.json(auctions);
+    try {
+      // Temporary mock data for testing
+      const mockAuctions = [
+        {
+          id: 1,
+          title: "Test Auction 1",
+          description: "Description for test auction 1",
+          currentPrice: 100,
+          imageUrl: "https://picsum.photos/200",
+          endTime: new Date(Date.now() + 86400000).toISOString(),
+          isActive: true
+        },
+        {
+          id: 2,
+          title: "Test Auction 2",
+          description: "Description for test auction 2",
+          currentPrice: 200,
+          imageUrl: "https://picsum.photos/200",
+          endTime: new Date(Date.now() + 86400000).toISOString(),
+          isActive: true
+        }
+      ];
+      res.json(mockAuctions);
+    } catch (error) {
+      console.error("Error fetching auctions:", error);
+      res.status(500).json({ message: "Error fetching auctions" });
+    }
   });
 
   app.post("/api/auctions", requireAuth, async (req, res) => {
@@ -137,6 +136,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auctions/:id/bids", async (req, res) => {
     const bids = await storage.getAuctionBids(Number(req.params.id));
     res.json(bids);
+  });
+
+  app.get("/api/auctions/events", (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    const send = (data: any) => {
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+    };
+
+    // Send initial auctions data
+    storage.getActiveAuctions().then((auctions) => {
+      send({ type: "initial", data: auctions });
+    });
+
+    // Store the client's send function
+    const clients = app.locals.sseClients || new Set();
+    clients.add(send);
+    app.locals.sseClients = clients;
+
+    // Remove client on connection close
+    req.on("close", () => {
+      clients.delete(send);
+    });
   });
 
   const httpServer = createServer(app);

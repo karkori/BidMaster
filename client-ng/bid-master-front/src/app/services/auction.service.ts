@@ -23,13 +23,16 @@ export interface AuctionFilters {
   providedIn: 'root',
 })
 export class AuctionService {
-  private apiUrl = 'http://localhost:5000/api';
+  // Updated to use window.location.origin to get the correct base URL
+  private apiUrl = `${window.location.origin}/api`;
   private filtersSubject = new BehaviorSubject<AuctionFilters>({});
 
   http = inject(HttpClient);
 
   getAuctions(): Observable<Auction[]> {
-    return this.http.get<Auction[]>(`${this.apiUrl}/auctions`);
+    return this.http.get<Auction[]>(`${this.apiUrl}/auctions`).pipe(
+      map(auctions => auctions || [])
+    );
   }
 
   getFilteredAuctions(filters: AuctionFilters): Observable<Auction[]> {
